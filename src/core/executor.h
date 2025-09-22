@@ -2,9 +2,9 @@
 #define EXECUTOR_H
 
 #include "parser.h"
+#include "platform.h"
 #include <memory>
 #include <vector>
-#include <sys/types.h>
 
 class Shell;
 
@@ -39,7 +39,7 @@ private:
     std::vector<char*> createArgv(std::shared_ptr<Command> command);
     
     // 等待子进程
-    int waitForChild(pid_t pid, bool background);
+    int waitForChild(ProcessHandle handle, bool background);
     
     // 处理信号
     void setupSignalHandlers();

@@ -1,13 +1,18 @@
 #include "executor.h"
 #include "shell.h"
 #include <iostream>
+#include <cstring>
+#include <cstdlib>
+
+#ifdef PLATFORM_WINDOWS
+#include "posix_compat.h"
+#else
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <cstring>
-#include <cstdlib>
 #include <signal.h>
+#endif
 
 Executor::Executor(Shell* shell) : shell(shell) {
     setupSignalHandlers();

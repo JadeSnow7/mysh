@@ -3,9 +3,14 @@
 #include <iomanip>
 #include <algorithm>
 #include <cstdlib>
+
+#ifdef PLATFORM_WINDOWS
+#include "posix_compat.h"
+#else
 #include <unistd.h>
 #include <pwd.h>
 #include <sys/types.h>
+#endif
 
 History::History() : maxHistorySize(1000) {
     historyFile = getHistoryFilePath();

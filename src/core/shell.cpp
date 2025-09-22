@@ -4,10 +4,15 @@
 #include "builtin.h"
 #include "history.h"
 #include <iostream>
-#include <unistd.h>
 #include <cstdlib>
+
+#ifdef PLATFORM_WINDOWS
+#include "posix_compat.h"
+#else
+#include <unistd.h>
 #include <pwd.h>
 #include <sys/types.h>
+#endif
 
 Shell::Shell() : shouldExit(false) {
     initialize();

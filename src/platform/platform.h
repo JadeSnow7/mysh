@@ -44,7 +44,7 @@
 #ifdef PLATFORM_WINDOWS
     typedef DWORD ProcessId;
     typedef HANDLE FileDescriptor;
-    typedef HANDLE ProcessHandle;
+    typedef DWORD ProcessHandle;  // Windows下使用进程ID而不是句柄
 #else
     typedef pid_t ProcessId;
     typedef int FileDescriptor;
