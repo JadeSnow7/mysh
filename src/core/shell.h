@@ -10,6 +10,7 @@ class Parser;
 class Executor;
 class BuiltinCommands;
 class History;
+class InputHandler;
 
 class Shell {
 public:
@@ -37,12 +38,19 @@ public:
     
     // 获取shell提示符
     std::string getPrompt();
+    
+    // 启用/禁用自动补全和语法高亮
+    void setCompletionEnabled(bool enabled);
+    void setSyntaxHighlightEnabled(bool enabled);
+    bool isCompletionEnabled() const;
+    bool isSyntaxHighlightEnabled() const;
 
 private:
     std::unique_ptr<Parser> parser;
     std::unique_ptr<Executor> executor;
     std::unique_ptr<BuiltinCommands> builtinCommands;
     std::unique_ptr<History> history;
+    std::unique_ptr<InputHandler> inputHandler;
     
     std::map<std::string, std::string> environmentVariables;
     std::string currentDirectory;
@@ -56,6 +64,9 @@ private:
     
     // 显示欢迎信息
     void showWelcome();
+    
+    // 显示命令输入提示
+    void showInputPrompt(const std::string& command);
 };
 
 #endif // SHELL_H

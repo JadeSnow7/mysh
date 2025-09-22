@@ -34,6 +34,9 @@ set(SOURCES
     src/core/executor.cpp
     src/core/builtin.cpp
     src/core/history.cpp
+    src/core/completion.cpp
+    src/core/syntax_highlighter.cpp
+    src/core/input_handler.cpp
     src/platform/platform.cpp
 )
 
@@ -44,11 +47,41 @@ set(HEADERS
     src/core/executor.h
     src/core/builtin.h
     src/core/history.h
+    src/core/completion.h
+    src/core/syntax_highlighter.h
+    src/core/input_handler.h
     src/platform/platform.h
 )
 
 # 创建可执行文件
 add_executable(mysh ${SOURCES} ${HEADERS})
+
+# 查找readline库
+find_package(PkgConfig QUIET)
+if(PkgConfig_FOUND)
+    pkg_check_modules(READLINE QUIET readline)
+endif()
+
+if(NOT READLINE_FOUND)
+    # 尝试直接查找
+    find_path(READLINE_INCLUDE_DIR readline/readline.h)
+    find_library(READLINE_LIBRARY NAMES readline)
+    
+    if(READLINE_INCLUDE_DIR AND READLINE_LIBRARY)
+        set(READLINE_FOUND TRUE)
+        set(READLINE_INCLUDE_DIRS ${READLINE_INCLUDE_DIR})
+        set(READLINE_LIBRARIES ${READLINE_LIBRARY})
+    endif()
+endif()
+
+if(READLINE_FOUND)
+    message(STATUS "Found GNU Readline")
+    target_compile_definitions(mysh PRIVATE HAVE_READLINE)
+    target_include_directories(mysh PRIVATE ${READLINE_INCLUDE_DIRS})
+    target_link_libraries(mysh ${READLINE_LIBRARIES})
+else()
+    message(STATUS "GNU Readline not found - using simple input mode")
+endif()
 
 # 平台特定的链接库
 if(WIN32)

@@ -8,6 +8,19 @@
 CXX = g++
 CXXFLAGS = -std=c++17 -Wall -Wextra -O2 -Isrc -Isrc/core -Isrc/platform
 DEBUG_FLAGS = -std=c++17 -Wall -Wextra -g -DDEBUG -Isrc -Isrc/core -Isrc/platform
+
+# Check for readline
+READLINE_AVAILABLE := $(shell pkg-config --exists readline 2>/dev/null && echo 1 || echo 0)
+ifeq ($(READLINE_AVAILABLE),1)
+	CXXFLAGS += -DHAVE_READLINE $(shell pkg-config --cflags readline)
+	LIBS += $(shell pkg-config --libs readline)
+else
+	# Try direct linking if pkg-config is not available
+	ifneq ($(wildcard /usr/include/readline/readline.h),)
+		CXXFLAGS += -DHAVE_READLINE
+		LIBS += -lreadline
+	endif
+endif
 SRCDIR = src
 COREDIR = $(SRCDIR)/core
 PLATFORMDIR = $(SRCDIR)/platform
@@ -18,6 +31,9 @@ SOURCES = $(SRCDIR)/main.cpp \
           $(COREDIR)/executor.cpp \
           $(COREDIR)/builtin.cpp \
           $(COREDIR)/history.cpp \
+          $(COREDIR)/completion.cpp \
+          $(COREDIR)/syntax_highlighter.cpp \
+          $(COREDIR)/input_handler.cpp \
           $(PLATFORMDIR)/platform.cpp
 OBJECTS = $(SOURCES:%.cpp=$(BUILDDIR)/%.o)
 TARGET = mysh
@@ -27,7 +43,7 @@ TARGET = mysh
 all: $(TARGET)
 
 $(TARGET): $(OBJECTS)
-	$(CXX) $(OBJECTS) -o $@
+	$(CXX) $(OBJECTS) -o $@ $(LIBS)
 
 $(BUILDDIR)/%.o: %.cpp | $(BUILDDIR)
 	@mkdir -p $(dir $@)

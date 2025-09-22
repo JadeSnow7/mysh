@@ -44,6 +44,12 @@ MyShell是一个用C++开发的跨平台shell工具，支持Linux、Windows和ma
 - ✅ 命令历史记录
 - ✅ 后台进程执行（`&`）
 
+### 🆕 增强功能
+- ✨ **智能自动补全**: 命令、文件路径、环境变量补全
+- ✨ **语法高亮**: 实时语法高亮显示，提升使用体验
+- ✨ **配置管理**: 通过set命令控制功能开关
+- ✨ **Readline集成**: 自动检测并使用GNU Readline库
+
 ### 内置命令
 
 | 命令 | 描述 | 示例 |
@@ -59,6 +65,7 @@ MyShell是一个用C++开发的跨平台shell工具，支持Linux、Windows和ma
 | `history` | 显示命令历史 | `history` |
 | `clear` | 清屏 | `clear` |
 | `which cmd` | 查找命令位置 | `which ls` |
+| `set [option] [value]` | 配置自动补全和语法高亮 | `set completion on` |
 
 ### 特殊功能
 
@@ -68,6 +75,8 @@ MyShell是一个用C++开发的跨平台shell工具，支持Linux、Windows和ma
 - **后台运行**: `command &`
 - **环境变量替换**: `echo $HOME`
 - **支持引号**: `echo "hello world"`
+- **Tab补全**: 自动补全命令和文件路径（需要readline）
+- **语法高亮**: 实时高亮命令和参数
 
 ## 架构设计
 
