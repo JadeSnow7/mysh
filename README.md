@@ -66,6 +66,7 @@ MyShell是一个用C++开发的跨平台shell工具，支持Linux、Windows和ma
 | `clear` | 清屏 | `clear` |
 | `which cmd` | 查找命令位置 | `which ls` |
 | `set [option] [value]` | 配置自动补全和语法高亮 | `set completion on` |
+| `ai [question]` | 向AI助手提问 | `ai 你好，你能帮我做什么？` |
 
 ### 特殊功能
 
@@ -77,6 +78,72 @@ MyShell是一个用C++开发的跨平台shell工具，支持Linux、Windows和ma
 - **支持引号**: `echo "hello world"`
 - **Tab补全**: 自动补全命令和文件路径（需要readline）
 - **语法高亮**: 实时高亮命令和参数
+- **AI助手**: 集成AI问答功能，支持本地和远程模型
+
+### AI助手功能
+
+MyShell集成了AI助手功能，可以通过`ai`命令向AI提问。AI助手支持两种模式：
+
+1. **远程模式**：连接到云端AI服务（如阿里云百炼平台）
+2. **本地模式**：使用本地部署的AI模型（如llama.cpp、Ollama等）
+
+#### 配置远程AI服务
+
+要使用远程AI服务，需要设置API密钥：
+
+```bash
+export AI_API_KEY=your_api_key_here
+```
+
+#### 配置本地AI模型
+
+要使用本地AI模型，需要设置模型路径：
+
+```bash
+export LOCAL_AI_MODEL_PATH=/path/to/your/model
+```
+
+或者在MyShell中使用set命令：
+
+```bash
+set ai-mode local
+set ai-model-path /path/to/your/model
+```
+
+#### 兼容的本地AI模型框架
+
+MyShell可以与以下本地AI模型框架配合使用：
+
+1. **Ollama**：
+   - 安装Ollama：https://ollama.com/
+   - 拉取模型：`ollama pull llama2`
+   - 运行模型服务：`ollama serve`
+   - 设置路径为：`http://localhost:11434`
+
+2. **llama.cpp**：
+   - 克隆仓库：`git clone https://github.com/ggerganov/llama.cpp`
+   - 编译：`make`
+   - 运行服务器：`./server -m models/your-model.gguf --port 8080`
+   - 设置路径为：`http://localhost:8080`
+
+3. **LM Studio**：
+   - 下载并安装：https://lmstudio.ai/
+   - 加载模型并启动本地服务器
+   - 设置路径为：`http://localhost:1234`
+
+#### 使用AI助手
+
+在MyShell中，可以直接使用`ai`命令向AI助手提问：
+
+```bash
+snow@mysh:~$ ai 你好，你能帮我做什么？
+AI Assistant: Hello! I'm an AI assistant integrated into MyShell. I can help you with various tasks such as:
+- Answering questions on a wide range of topics
+- Providing explanations and information
+- Assisting with MyShell usage
+- Helping with general programming or technical questions
+Feel free to ask me anything!
+```
 
 ## 架构设计
 

@@ -166,49 +166,91 @@ bool SyntaxHighlighter::isRedirection(const std::string& token) {
 
 std::vector<std::string> SyntaxHighlighter::tokenize(const std::string& line) {
     std::vector<std::string> tokens;
-    std::istringstream iss(line);
-    std::string token;
-    
-    bool in_quotes = false;
-    char quote_char = '\0';
     std::string current_token;
     
-    for (char c : line) {
-        if (!in_quotes && (c == '"' || c == '\'')) {
-            in_quotes = true;
-            quote_char = c;
-            current_token += c;
-        } else if (in_quotes && c == quote_char) {
-            in_quotes = false;
-            current_token += c;
-            tokens.push_back(current_token);
-            current_token.clear();
-        } else if (!in_quotes && std::isspace(c)) {
-            if (!current_token.empty()) {
+    for (size_t i = 0; i < line.length(); ++i) {
+        char c = line[i];
+        
+        // 处理引号
+        if (c == '"' || c == '\'') {
+            if (!current_token.empty() && current_token[0] != '"' && current_token[0] != '\'') {
+                // 当前token不是字符串，需要先保存
                 tokens.push_back(current_token);
                 current_token.clear();
             }
-        } else if (!in_quotes && (c == '|' || c == '&' || c == '>' || c == '<')) {
+            
+            if (current_token.empty()) {
+                // 开始新的字符串token
+                current_token += c;
+                // 找到匹配的结束引号
+                size_t end = i + 1;
+                while (end < line.length() && line[end] != c) {
+                    current_token += line[end];
+                    end++;
+                }
+                if (end < line.length()) {
+                    current_token += line[end]; // 添加结束引号
+                    tokens.push_back(current_token);
+                    current_token.clear();
+                    i = end; // 跳过已处理的部分
+                }
+            } else if (current_token[0] == c) {
+                // 结束当前字符串token
+                current_token += c;
+                tokens.push_back(current_token);
+                current_token.clear();
+            }
+        }
+        // 处理操作符
+        else if (c == '|' || c == '&' || c == '>' || c == '<') {
+            // 保存之前的token
             if (!current_token.empty()) {
                 tokens.push_back(current_token);
                 current_token.clear();
             }
             
-            // 处理重定向操作符
+            // 处理多字符操作符
             std::string op(1, c);
-            if (c == '>' && !line.empty()) {
-                // 检查是否是 >> 或 2>
-                size_t pos = &c - &line[0];
-                if (pos + 1 < line.length() && line[pos + 1] == '>') {
-                    op = ">>";
+            if (c == '>' && i + 1 < line.length() && line[i + 1] == '>') {
+                op = ">>";
+                i++; // 跳过下一个字符
+            } else if (c == '<' && i + 1 < line.length() && line[i + 1] == '<') {
+                op = "<<";
+                i++; // 跳过下一个字符
+            } else if (c == '&' && i + 1 < line.length() && line[i + 1] == '>') {
+                op = "&>";
+                i++; // 跳过下一个字符
+            } else if (c == '2') {
+                // 检查是否是2>或2>>
+                if (i + 1 < line.length() && line[i + 1] == '>') {
+                    op = "2>";
+                    i++; // 跳过下一个字符
+                    if (i + 1 < line.length() && line[i + 1] == '>') {
+                        op = "2>>";
+                        i++; // 跳过下一个字符
+                    }
+                } else {
+                    current_token += c;
+                    continue;
                 }
             }
+            
             tokens.push_back(op);
-        } else {
+        }
+        // 处理空格
+        else if (std::isspace(c)) {
+            if (!current_token.empty()) {
+                tokens.push_back(current_token);
+                current_token.clear();
+            }
+        }
+        // 其他字符
+        else {
             current_token += c;
         }
     }
     
+    // 保存最后一个token
     if (!current_token.empty()) {
         tokens.push_back(current_token);
     }

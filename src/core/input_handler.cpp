@@ -120,12 +120,6 @@ std::string InputHandler::readLineSimple(const std::string& prompt) {
         return "";
     }
     
-    // 应用语法高亮（仅用于显示，不改变实际输入）
-    if (syntax_highlighter_ && syntax_highlighter_->isEnabled() && !input.empty()) {
-        // 在简单模式下，我们可以在命令执行后显示高亮版本
-        // 这里只是记录，实际高亮会在其他地方处理
-    }
-    
     return input;
 }
 

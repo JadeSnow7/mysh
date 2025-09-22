@@ -1,10 +1,5 @@
 # Makefile for MyShell
 
-
-
-
-
-
 CXX = g++
 CXXFLAGS = -std=c++17 -Wall -Wextra -O2 -Isrc -Isrc/core -Isrc/platform
 DEBUG_FLAGS = -std=c++17 -Wall -Wextra -g -DDEBUG -Isrc -Isrc/core -Isrc/platform
@@ -21,10 +16,12 @@ else
 		LIBS += -lreadline
 	endif
 endif
+
 SRCDIR = src
 COREDIR = $(SRCDIR)/core
 PLATFORMDIR = $(SRCDIR)/platform
 BUILDDIR = build
+
 SOURCES = $(SRCDIR)/main.cpp \
           $(COREDIR)/shell.cpp \
           $(COREDIR)/parser.cpp \
@@ -34,7 +31,9 @@ SOURCES = $(SRCDIR)/main.cpp \
           $(COREDIR)/completion.cpp \
           $(COREDIR)/syntax_highlighter.cpp \
           $(COREDIR)/input_handler.cpp \
+          $(COREDIR)/ai_client.cpp \
           $(PLATFORMDIR)/platform.cpp
+
 OBJECTS = $(SOURCES:%.cpp=$(BUILDDIR)/%.o)
 TARGET = mysh
 

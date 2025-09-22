@@ -4,6 +4,8 @@
 #include "builtin.h"
 #include "history.h"
 #include "input_handler.h"
+#include "syntax_highlighter.h"
+#include "completion.h"
 #include <iostream>
 #include <cstdlib>
 
@@ -80,7 +82,9 @@ int Shell::run() {
             
             // 添加到历史记录
             history->addCommand(input);
-            inputHandler->addHistory(input);
+            if (inputHandler) {
+                inputHandler->addHistory(input);
+            }
             
             // 执行命令
             executeCommand(input);
@@ -187,9 +191,14 @@ void Shell::showWelcome() {
 void Shell::showInputPrompt(const std::string& command) {
     // 如果启用了语法高亮，显示高亮版本
     if (inputHandler && inputHandler->isSyntaxHighlightEnabled() && !command.empty()) {
-        // 注意：这里我们不重新打印命令，因为在readline模式下命令已经显示
-        // 在简单模式下，我们可以选择显示高亮版本作为反馈
-        // 这个功能可以根据需要调整
+        // 获取高亮版本的命令
+        auto highlighter = inputHandler->getSyntaxHighlighter();
+        if (highlighter) {
+            std::string highlighted = highlighter->highlight(command);
+            // 在简单模式下显示高亮版本作为反馈
+            // 注意：我们需要确保这不会干扰实际的命令执行
+            std::cout << "\r" << getPrompt() << highlighted << std::endl;
+        }
     }
 }
 

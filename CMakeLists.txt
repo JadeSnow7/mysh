@@ -39,6 +39,8 @@ set(SOURCES
     src/core/completion.cpp
     src/core/syntax_highlighter.cpp
     src/core/input_handler.cpp
+    src/core/ai_client.cpp
+    src/core/ai_command.cpp
     src/platform/platform.cpp
 )
 
@@ -99,6 +101,60 @@ if(READLINE_FOUND)
     target_link_libraries(mysh ${READLINE_LIBRARIES})
 else()
     message(STATUS "GNU Readline not found - using simple input mode")
+endif()
+
+# 查找curl库
+find_package(PkgConfig QUIET)
+if(PkgConfig_FOUND)
+    pkg_check_modules(CURL QUIET libcurl)
+endif()
+
+if(NOT CURL_FOUND)
+    # 尝试直接查找
+    find_path(CURL_INCLUDE_DIR curl/curl.h)
+    find_library(CURL_LIBRARY NAMES curl)
+    
+    if(CURL_INCLUDE_DIR AND CURL_LIBRARY)
+        set(CURL_FOUND TRUE)
+        set(CURL_INCLUDE_DIRS ${CURL_INCLUDE_DIR})
+        set(CURL_LIBRARIES ${CURL_LIBRARY})
+    endif()
+endif()
+
+if(CURL_FOUND)
+    message(STATUS "Found libcurl")
+    target_compile_definitions(mysh PRIVATE HAVE_CURL)
+    target_include_directories(mysh PRIVATE ${CURL_INCLUDE_DIRS})
+    target_link_libraries(mysh ${CURL_LIBRARIES})
+else()
+    message(WARNING "libcurl not found - AI features will be disabled")
+endif()
+
+# 查找jsoncpp库
+find_package(PkgConfig QUIET)
+if(PkgConfig_FOUND)
+    pkg_check_modules(JSONCPP QUIET jsoncpp)
+endif()
+
+if(NOT JSONCPP_FOUND)
+    # 尝试直接查找
+    find_path(JSONCPP_INCLUDE_DIR json/json.h)
+    find_library(JSONCPP_LIBRARY NAMES jsoncpp)
+    
+    if(JSONCPP_INCLUDE_DIR AND JSONCPP_LIBRARY)
+        set(JSONCPP_FOUND TRUE)
+        set(JSONCPP_INCLUDE_DIRS ${JSONCPP_INCLUDE_DIR})
+        set(JSONCPP_LIBRARIES ${JSONCPP_LIBRARY})
+    endif()
+endif()
+
+if(JSONCPP_FOUND)
+    message(STATUS "Found jsoncpp")
+    target_compile_definitions(mysh PRIVATE HAVE_JSONCPP)
+    target_include_directories(mysh PRIVATE ${JSONCPP_INCLUDE_DIRS})
+    target_link_libraries(mysh ${JSONCPP_LIBRARIES})
+else()
+    message(WARNING "jsoncpp not found - AI features will be disabled")
 endif()
 
 # 平台特定的链接库

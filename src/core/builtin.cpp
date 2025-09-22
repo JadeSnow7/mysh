@@ -9,6 +9,9 @@
 #include <sys/stat.h>
 
 BuiltinCommands::BuiltinCommands(Shell* shell) : shell(shell) {
+    // 初始化AI客户端
+    aiClient_ = std::make_unique<AIClient>();
+    
     initializeBuiltins();
 }
 
@@ -27,6 +30,7 @@ void BuiltinCommands::initializeBuiltins() {
     builtinMap["clear"] = [this](std::shared_ptr<Command> cmd) { return cmdClear(cmd); };
     builtinMap["which"] = [this](std::shared_ptr<Command> cmd) { return cmdWhich(cmd); };
     builtinMap["set"] = [this](std::shared_ptr<Command> cmd) { return cmdSet(cmd); };
+    builtinMap["ai"] = [this](std::shared_ptr<Command> cmd) { return cmdAi(cmd); };  // 添加AI命令
 }
 
 bool BuiltinCommands::isBuiltinCommand(const std::string& command) {
@@ -288,6 +292,7 @@ void BuiltinCommands::printHelp() {
     std::cout << "  clear     - 清屏" << std::endl;
     std::cout << "  which     - 查找命令位置" << std::endl;
     std::cout << "  set       - 配置自动补全和语法高亮" << std::endl;
+    std::cout << "  ai        - 向AI助手提问" << std::endl;
     std::cout << std::endl;
     std::cout << "特殊功能：" << std::endl;
     std::cout << "  > file    - 输出重定向" << std::endl;
@@ -297,6 +302,12 @@ void BuiltinCommands::printHelp() {
     std::cout << "  cmd &     - 后台运行" << std::endl;
     std::cout << "  $VAR      - 环境变量替换" << std::endl;
     std::cout << "  Tab       - 自动补全（安装readline时）" << std::endl;
+    std::cout << std::endl;
+    std::cout << "AI助手设置：" << std::endl;
+    std::cout << "  set ai-mode local|remote  - 设置AI模式为本地或远程" << std::endl;
+    std::cout << "  set ai-model-path <path>  - 设置本地AI模型路径" << std::endl;
+    std::cout << "  export AI_API_KEY=<key>   - 设置远程AI服务API密钥" << std::endl;
+    std::cout << "  export LOCAL_AI_MODEL_PATH=<path> - 设置本地AI模型路径" << std::endl;
 }
 
 bool BuiltinCommands::changeDirectory(const std::string& path) {
@@ -315,6 +326,8 @@ bool BuiltinCommands::changeDirectory(const std::string& path) {
     return true;
 }
 
+
+
 int BuiltinCommands::cmdSet(std::shared_ptr<Command> command) {
     if (command->arguments.empty()) {
         // 显示当前设置
@@ -325,6 +338,8 @@ int BuiltinCommands::cmdSet(std::shared_ptr<Command> command) {
         std::cout << "用法:" << std::endl;
         std::cout << "  set completion on|off     - 启用/禁用自动补全" << std::endl;
         std::cout << "  set syntax-highlight on|off - 启用/禁用语法高亮" << std::endl;
+        std::cout << "  set ai-mode local|remote  - 设置AI模式为本地或远程" << std::endl;
+        std::cout << "  set ai-model-path <path>  - 设置本地AI模型路径" << std::endl;
         return 0;
     }
     
@@ -349,9 +364,36 @@ int BuiltinCommands::cmdSet(std::shared_ptr<Command> command) {
         shell->setSyntaxHighlightEnabled(enable);
         std::cout << "Syntax highlighting " << (enable ? "enabled" : "disabled") << std::endl;
         return 0;
+    } else if (option == "ai-mode") {
+        if (aiClient_) {
+            if (value == "local") {
+                aiClient_->setUseLocalModel(true);
+                std::cout << "AI mode set to local" << std::endl;
+                return 0;
+            } else if (value == "remote") {
+                aiClient_->setUseLocalModel(false);
+                std::cout << "AI mode set to remote" << std::endl;
+                return 0;
+            } else {
+                std::cerr << "set: invalid AI mode. Use 'local' or 'remote'." << std::endl;
+                return 1;
+            }
+        } else {
+            std::cerr << "set: AI client not available" << std::endl;
+            return 1;
+        }
+    } else if (option == "ai-model-path") {
+        if (aiClient_) {
+            aiClient_->setLocalModelPath(value);
+            std::cout << "Local AI model path set to: " << value << std::endl;
+            return 0;
+        } else {
+            std::cerr << "set: AI client not available" << std::endl;
+            return 1;
+        }
     } else {
         std::cerr << "set: unknown option '" << option << "'" << std::endl;
-        std::cerr << "Available options: completion, syntax-highlight" << std::endl;
+        std::cerr << "Available options: completion, syntax-highlight, ai-mode, ai-model-path" << std::endl;
         return 1;
     }
 }

@@ -30,6 +30,9 @@ public:
     void setSyntaxHighlightEnabled(bool enabled);
     bool isSyntaxHighlightEnabled() const;
     
+    // 获取语法高亮器（用于外部访问）
+    SyntaxHighlighter* getSyntaxHighlighter() { return syntax_highlighter_.get(); }
+    
     // 添加历史记录
     void addHistory(const std::string& line);
     

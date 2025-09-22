@@ -91,6 +91,9 @@ public:
     // 注册内置命令列表
     void setBuiltinCommands(const std::set<std::string>& commands);
     
+    // 分词器（用于测试）
+    std::vector<std::string> tokenize(const std::string& line);
+
 private:
     bool enabled_;
     std::map<SyntaxType, HighlightStyle> styles_;
@@ -110,9 +113,6 @@ private:
     bool isPath(const std::string& token);
     bool isNumber(const std::string& token);
     bool isRedirection(const std::string& token);
-    
-    // 分词器
-    std::vector<std::string> tokenize(const std::string& line);
 };
 
 #endif // SYNTAX_HIGHLIGHTER_H
