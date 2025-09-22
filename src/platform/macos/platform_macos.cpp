@@ -1,6 +1,6 @@
-#include "platform.h"
+#include "../platform.h"
 
-#ifdef PLATFORM_LINUX
+#ifdef PLATFORM_MACOS
 
 #include <iostream>
 #include <sstream>
@@ -8,8 +8,9 @@
 #include <cstdlib>
 #include <cstring>
 #include <algorithm>
+#include <mach-o/dyld.h>
 
-class LinuxPlatform : public PlatformInterface {
+class MacOSPlatform : public PlatformInterface {
 public:
     ProcessId createProcess(const std::string& executable, 
                            const std::vector<std::string>& args) override {
@@ -79,7 +80,7 @@ public:
     bool setupRedirection(const std::string& inputFile, 
                          const std::string& outputFile, 
                          bool appendOutput) override {
-        // 实现重定向逻辑（简化版）
+        // macOS使用与Linux相同的重定向机制
         if (!inputFile.empty()) {
             int fd = open(inputFile.c_str(), O_RDONLY);
             if (fd == -1) return false;
@@ -176,7 +177,10 @@ public:
     void setupSignalHandlers() override {
         signal(SIGINT, SIG_IGN);
         signal(SIGQUIT, SIG_IGN);
+        
+        // macOS特定：处理一些额外的信号
+        signal(SIGPIPE, SIG_IGN);
     }
 };
 
-#endif // PLATFORM_LINUX
+#endif // PLATFORM_MACOS

@@ -1,26 +1,39 @@
 # Makefile for MyShell
 
+
 CXX = g++
-CXXFLAGS = -std=c++17 -Wall -Wextra -O2
-DEBUG_FLAGS = -std=c++17 -Wall -Wextra -g -DDEBUG
+CXXFLAGS = -std=c++17 -Wall -Wextra -O2 -Isrc -Isrc/core -Isrc/platform
+DEBUG_FLAGS = -std=c++17 -Wall -Wextra -g -DDEBUG -Isrc -Isrc/core -Isrc/platform
 SRCDIR = src
+COREDIR = $(SRCDIR)/core
+PLATFORMDIR = $(SRCDIR)/platform
 BUILDDIR = build
-SOURCES = $(wildcard $(SRCDIR)/*.cpp)
-OBJECTS = $(SOURCES:$(SRCDIR)/%.cpp=$(BUILDDIR)/%.o)
+SOURCES = $(SRCDIR)/main.cpp \
+          $(COREDIR)/shell.cpp \
+          $(COREDIR)/parser.cpp \
+          $(COREDIR)/executor.cpp \
+          $(COREDIR)/builtin.cpp \
+          $(COREDIR)/history.cpp \
+          $(PLATFORMDIR)/platform.cpp
+OBJECTS = $(SOURCES:%.cpp=$(BUILDDIR)/%.o)
 TARGET = mysh
 
-.PHONY: all clean debug test install
+.PHONY: all clean debug test install help
 
 all: $(TARGET)
 
 $(TARGET): $(OBJECTS)
 	$(CXX) $(OBJECTS) -o $@
 
-$(BUILDDIR)/%.o: $(SRCDIR)/%.cpp | $(BUILDDIR)
+$(BUILDDIR)/%.o: %.cpp | $(BUILDDIR)
+	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(BUILDDIR):
 	mkdir -p $(BUILDDIR)
+	mkdir -p $(BUILDDIR)/$(SRCDIR)
+	mkdir -p $(BUILDDIR)/$(COREDIR)
+	mkdir -p $(BUILDDIR)/$(PLATFORMDIR)
 
 debug: CXXFLAGS = $(DEBUG_FLAGS)
 debug: $(TARGET)
@@ -30,7 +43,11 @@ clean:
 
 test: $(TARGET)
 	@echo "Running basic functionality test..."
-	@bash test_shell.sh
+	@if [ -f tests/integration/test_shell.sh ]; then \
+		bash tests/integration/test_shell.sh; \
+	else \
+		echo "Test script not found"; \
+	fi
 
 install: $(TARGET)
 	@echo "Installing to /usr/local/bin/ (requires sudo)"
@@ -46,9 +63,10 @@ help:
 	@echo "  help     - Show this help message"
 
 # 依赖关系
-$(BUILDDIR)/main.o: $(SRCDIR)/shell.h
-$(BUILDDIR)/shell.o: $(SRCDIR)/shell.h $(SRCDIR)/parser.h $(SRCDIR)/executor.h $(SRCDIR)/builtin.h $(SRCDIR)/history.h
-$(BUILDDIR)/parser.o: $(SRCDIR)/parser.h
-$(BUILDDIR)/executor.o: $(SRCDIR)/executor.h $(SRCDIR)/parser.h $(SRCDIR)/shell.h
-$(BUILDDIR)/builtin.o: $(SRCDIR)/builtin.h $(SRCDIR)/parser.h $(SRCDIR)/shell.h $(SRCDIR)/history.h
-$(BUILDDIR)/history.o: $(SRCDIR)/history.h
+$(BUILDDIR)/$(SRCDIR)/main.o: $(COREDIR)/shell.h
+$(BUILDDIR)/$(COREDIR)/shell.o: $(COREDIR)/shell.h $(COREDIR)/parser.h $(COREDIR)/executor.h $(COREDIR)/builtin.h $(COREDIR)/history.h
+$(BUILDDIR)/$(COREDIR)/parser.o: $(COREDIR)/parser.h
+$(BUILDDIR)/$(COREDIR)/executor.o: $(COREDIR)/executor.h $(COREDIR)/parser.h $(COREDIR)/shell.h
+$(BUILDDIR)/$(COREDIR)/builtin.o: $(COREDIR)/builtin.h $(COREDIR)/parser.h $(COREDIR)/shell.h $(COREDIR)/history.h
+$(BUILDDIR)/$(COREDIR)/history.o: $(COREDIR)/history.h
+$(BUILDDIR)/$(PLATFORMDIR)/platform.o: $(PLATFORMDIR)/platform.h

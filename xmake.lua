@@ -26,7 +26,14 @@ set_warnings("all")
 
 target("mysh")
     set_kind("binary")
-    add_files("src/*.cpp")
+    
+    -- 添加包含目录
+    add_includedirs("src", "src/core", "src/platform")
+    
+    -- 添加源文件
+    add_files("src/main.cpp")
+    add_files("src/core/*.cpp")
+    add_files("src/platform/platform.cpp")
     
     -- 平台特定的链接库
     if is_plat("windows") then

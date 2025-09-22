@@ -21,25 +21,30 @@ elseif(UNIX)
     add_definitions(-DPLATFORM_LINUX)
 endif()
 
+# 添加源文件目录到包含路径
+include_directories(src)
+include_directories(src/core)
+include_directories(src/platform)
+
 # 源文件
 set(SOURCES
     src/main.cpp
-    src/shell.cpp
-    src/parser.cpp
-    src/executor.cpp
-    src/builtin.cpp
-    src/history.cpp
-    src/platform.cpp
+    src/core/shell.cpp
+    src/core/parser.cpp
+    src/core/executor.cpp
+    src/core/builtin.cpp
+    src/core/history.cpp
+    src/platform/platform.cpp
 )
 
 # 头文件
 set(HEADERS
-    src/shell.h
-    src/parser.h
-    src/executor.h
-    src/builtin.h
-    src/history.h
-    src/platform.h
+    src/core/shell.h
+    src/core/parser.h
+    src/core/executor.h
+    src/core/builtin.h
+    src/core/history.h
+    src/platform/platform.h
 )
 
 # 创建可执行文件

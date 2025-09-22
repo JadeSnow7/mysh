@@ -2,11 +2,11 @@
 
 // 包含平台特定实现
 #ifdef PLATFORM_LINUX
-#include "platform_linux.cpp"
+#include "linux/platform_linux.cpp"
 #elif defined(PLATFORM_WINDOWS)
-#include "platform_windows.cpp"
+#include "windows/platform_windows.cpp"
 #elif defined(PLATFORM_MACOS)
-#include "platform_macos.cpp"
+#include "macos/platform_macos.cpp"
 #endif
 
 std::unique_ptr<PlatformInterface> createPlatformInterface() {
