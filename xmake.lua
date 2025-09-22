@@ -3,6 +3,15 @@ add_rules("mode.debug", "mode.release")
 -- 设置C++标准
 set_languages("c++17")
 
+-- 平台检测和定义
+if is_plat("windows") then
+    add_defines("PLATFORM_WINDOWS")
+elseif is_plat("macosx") then
+    add_defines("PLATFORM_MACOS")
+elseif is_plat("linux") then
+    add_defines("PLATFORM_LINUX")
+end
+
 -- 添加编译选项
 if is_mode("debug") then
     add_defines("DEBUG")
@@ -19,8 +28,10 @@ target("mysh")
     set_kind("binary")
     add_files("src/*.cpp")
     
-    -- 链接系统库
-    if is_plat("linux") then
+    -- 平台特定的链接库
+    if is_plat("windows") then
+        add_syslinks("shlwapi")
+    elseif is_plat("linux", "macosx") then
         add_syslinks("pthread")
     end
 

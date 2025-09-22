@@ -6,6 +6,9 @@
 #include <memory>
 
 // 平台检测宏
+#ifndef PLATFORM_WINDOWS
+#ifndef PLATFORM_MACOS
+#ifndef PLATFORM_LINUX
 #ifdef _WIN32
     #define PLATFORM_WINDOWS
 #elif defined(__APPLE__)
@@ -14,6 +17,9 @@
     #define PLATFORM_LINUX
 #else
     #define PLATFORM_UNKNOWN
+#endif
+#endif
+#endif
 #endif
 
 // 平台特定包含
