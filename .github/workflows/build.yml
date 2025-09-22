@@ -19,7 +19,7 @@ jobs:
     - uses: actions/checkout@v4
     
     - name: Set up CMake
-      uses: jwlawson/actions-setup-cmake@v1.14
+      uses: jwlawson/actions-setup-cmake@v2
       with:
         cmake-version: '3.15'
     
@@ -55,10 +55,11 @@ jobs:
         ctest --output-on-failure -C ${{ matrix.build_type }}
     
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: mysh-${{ matrix.os }}-${{ matrix.build_type }}
         path: |
-          build/bin/mysh*
-          build/Release/bin/mysh*
-          build/Debug/bin/mysh*
+          build/bin/
+          build/Release/bin/
+          build/Debug/bin/
+        if-no-files-found: ignore
