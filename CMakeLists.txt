@@ -36,9 +36,13 @@ set(SOURCES
     src/core/parser.cpp
     src/core/builtin.cpp
     src/core/history.cpp
+    src/core/completion.cpp
+    src/core/syntax_highlighter.cpp
+    src/core/input_handler.cpp
     src/platform/platform.cpp
 )
 
+<<<<<<< HEAD
 # 平台特定源文件
 if(WIN32)
     list(APPEND SOURCES 
@@ -48,12 +52,68 @@ if(WIN32)
 else()
     list(APPEND SOURCES src/core/executor.cpp)
 endif()
+=======
+# 头文件
+set(HEADERS
+    src/core/shell.h
+    src/core/parser.h
+    src/core/executor.h
+    src/core/builtin.h
+    src/core/history.h
+    src/core/completion.h
+    src/core/syntax_highlighter.h
+    src/core/input_handler.h
+    src/platform/platform.h
+)
+>>>>>>> 38c84ec98f1a450d11385b24f37f175d985e805b
 
 # 创建可执行文件
 add_executable(mysh ${SOURCES})
 
+<<<<<<< HEAD
 # 简化版本
 add_executable(mysh_simple src/main_windows.cpp)
+=======
+# 查找readline库
+find_package(PkgConfig QUIET)
+if(PkgConfig_FOUND)
+    pkg_check_modules(READLINE QUIET readline)
+endif()
+
+if(NOT READLINE_FOUND)
+    # 尝试直接查找
+    find_path(READLINE_INCLUDE_DIR readline/readline.h)
+    find_library(READLINE_LIBRARY NAMES readline)
+    
+    if(READLINE_INCLUDE_DIR AND READLINE_LIBRARY)
+        set(READLINE_FOUND TRUE)
+        set(READLINE_INCLUDE_DIRS ${READLINE_INCLUDE_DIR})
+        set(READLINE_LIBRARIES ${READLINE_LIBRARY})
+    endif()
+endif()
+
+if(READLINE_FOUND)
+    message(STATUS "Found GNU Readline")
+    target_compile_definitions(mysh PRIVATE HAVE_READLINE)
+    target_include_directories(mysh PRIVATE ${READLINE_INCLUDE_DIRS})
+    target_link_libraries(mysh ${READLINE_LIBRARIES})
+else()
+    message(STATUS "GNU Readline not found - using simple input mode")
+endif()
+
+# 平台特定的链接库
+if(WIN32)
+    target_link_libraries(mysh shlwapi)
+elseif(UNIX AND NOT APPLE)
+    # Linux特定库
+    find_package(Threads REQUIRED)
+    target_link_libraries(mysh Threads::Threads)
+elseif(APPLE)
+    # macOS特定库
+    find_package(Threads REQUIRED)
+    target_link_libraries(mysh Threads::Threads)
+endif()
+>>>>>>> 38c84ec98f1a450d11385b24f37f175d985e805b
 
 # 设置输出目录
 set_target_properties(mysh PROPERTIES

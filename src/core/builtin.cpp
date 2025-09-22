@@ -3,6 +3,7 @@
 #include "history.h"
 #include <iostream>
 #include <iomanip>
+#include <algorithm>
 #include <unistd.h>
 #include <cstdlib>
 #include <sys/stat.h>
@@ -25,6 +26,7 @@ void BuiltinCommands::initializeBuiltins() {
     builtinMap["history"] = [this](std::shared_ptr<Command> cmd) { return cmdHistory(cmd); };
     builtinMap["clear"] = [this](std::shared_ptr<Command> cmd) { return cmdClear(cmd); };
     builtinMap["which"] = [this](std::shared_ptr<Command> cmd) { return cmdWhich(cmd); };
+    builtinMap["set"] = [this](std::shared_ptr<Command> cmd) { return cmdSet(cmd); };
 }
 
 bool BuiltinCommands::isBuiltinCommand(const std::string& command) {
@@ -285,6 +287,7 @@ void BuiltinCommands::printHelp() {
     std::cout << "  history   - 显示命令历史" << std::endl;
     std::cout << "  clear     - 清屏" << std::endl;
     std::cout << "  which     - 查找命令位置" << std::endl;
+    std::cout << "  set       - 配置自动补全和语法高亮" << std::endl;
     std::cout << std::endl;
     std::cout << "特殊功能：" << std::endl;
     std::cout << "  > file    - 输出重定向" << std::endl;
@@ -293,6 +296,7 @@ void BuiltinCommands::printHelp() {
     std::cout << "  cmd1 | cmd2 - 管道" << std::endl;
     std::cout << "  cmd &     - 后台运行" << std::endl;
     std::cout << "  $VAR      - 环境变量替换" << std::endl;
+    std::cout << "  Tab       - 自动补全（安装readline时）" << std::endl;
 }
 
 bool BuiltinCommands::changeDirectory(const std::string& path) {
@@ -309,4 +313,45 @@ bool BuiltinCommands::changeDirectory(const std::string& path) {
     }
     
     return true;
+}
+
+int BuiltinCommands::cmdSet(std::shared_ptr<Command> command) {
+    if (command->arguments.empty()) {
+        // 显示当前设置
+        std::cout << "MyShell 设置:" << std::endl;
+        std::cout << "  completion: " << (shell->isCompletionEnabled() ? "enabled" : "disabled") << std::endl;
+        std::cout << "  syntax-highlight: " << (shell->isSyntaxHighlightEnabled() ? "enabled" : "disabled") << std::endl;
+        std::cout << std::endl;
+        std::cout << "用法:" << std::endl;
+        std::cout << "  set completion on|off     - 启用/禁用自动补全" << std::endl;
+        std::cout << "  set syntax-highlight on|off - 启用/禁用语法高亮" << std::endl;
+        return 0;
+    }
+    
+    if (command->arguments.size() < 2) {
+        std::cerr << "set: missing arguments" << std::endl;
+        std::cerr << "Usage: set <option> <value>" << std::endl;
+        return 1;
+    }
+    
+    std::string option = command->arguments[0];
+    std::string value = command->arguments[1];
+    
+    // 标准化值
+    std::transform(value.begin(), value.end(), value.begin(), ::tolower);
+    bool enable = (value == "on" || value == "true" || value == "1" || value == "enabled");
+    
+    if (option == "completion") {
+        shell->setCompletionEnabled(enable);
+        std::cout << "Auto-completion " << (enable ? "enabled" : "disabled") << std::endl;
+        return 0;
+    } else if (option == "syntax-highlight") {
+        shell->setSyntaxHighlightEnabled(enable);
+        std::cout << "Syntax highlighting " << (enable ? "enabled" : "disabled") << std::endl;
+        return 0;
+    } else {
+        std::cerr << "set: unknown option '" << option << "'" << std::endl;
+        std::cerr << "Available options: completion, syntax-highlight" << std::endl;
+        return 1;
+    }
 }

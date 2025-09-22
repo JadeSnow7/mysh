@@ -3,6 +3,7 @@
 #include "executor.h"
 #include "builtin.h"
 #include "history.h"
+#include "input_handler.h"
 #include <iostream>
 #include <cstdlib>
 
@@ -26,6 +27,10 @@ void Shell::initialize() {
     executor = std::make_unique<Executor>(this);
     builtinCommands = std::make_unique<BuiltinCommands>(this);
     history = std::make_unique<History>();
+    
+    // 重新启用InputHandler
+    inputHandler = std::make_unique<InputHandler>(this);
+    inputHandler->initialize();
     
     // 获取当前工作目录
     char* cwd = getcwd(nullptr, 0);
@@ -63,7 +68,6 @@ int Shell::run() {
     while (!shouldExit) {
         try {
             // 显示提示符并读取输入
-            std::cout << getPrompt();
             std::string input = readInput();
             
             // 跳过空输入
@@ -71,8 +75,12 @@ int Shell::run() {
                 continue;
             }
             
+            // 显示语法高亮版本（如果启用）
+            showInputPrompt(input);
+            
             // 添加到历史记录
             history->addCommand(input);
+            inputHandler->addHistory(input);
             
             // 执行命令
             executeCommand(input);
@@ -149,6 +157,12 @@ std::string Shell::getPrompt() {
 }
 
 std::string Shell::readInput() {
+    if (inputHandler) {
+        return inputHandler->readLine(getPrompt());
+    }
+    
+    // 备用方案：简单输入
+    std::cout << getPrompt();
     std::string input;
     std::getline(std::cin, input);
     
@@ -168,4 +182,33 @@ void Shell::showWelcome() {
     std::cout << "    输入 'help' 查看可用命令" << std::endl;
     std::cout << "    输入 'exit' 退出shell" << std::endl;
     std::cout << "==================================" << std::endl;
+}
+
+void Shell::showInputPrompt(const std::string& command) {
+    // 如果启用了语法高亮，显示高亮版本
+    if (inputHandler && inputHandler->isSyntaxHighlightEnabled() && !command.empty()) {
+        // 注意：这里我们不重新打印命令，因为在readline模式下命令已经显示
+        // 在简单模式下，我们可以选择显示高亮版本作为反馈
+        // 这个功能可以根据需要调整
+    }
+}
+
+void Shell::setCompletionEnabled(bool enabled) {
+    if (inputHandler) {
+        inputHandler->setCompletionEnabled(enabled);
+    }
+}
+
+void Shell::setSyntaxHighlightEnabled(bool enabled) {
+    if (inputHandler) {
+        inputHandler->setSyntaxHighlightEnabled(enabled);
+    }
+}
+
+bool Shell::isCompletionEnabled() const {
+    return inputHandler ? inputHandler->isCompletionEnabled() : false;
+}
+
+bool Shell::isSyntaxHighlightEnabled() const {
+    return inputHandler ? inputHandler->isSyntaxHighlightEnabled() : false;
 }

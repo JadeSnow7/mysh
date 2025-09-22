@@ -35,6 +35,7 @@ private:
     int cmdHistory(std::shared_ptr<Command> command);
     int cmdClear(std::shared_ptr<Command> command);
     int cmdWhich(std::shared_ptr<Command> command);
+    int cmdSet(std::shared_ptr<Command> command);  // 新增：配置设置命令
     
     // 初始化内置命令映射
     void initializeBuiltins();

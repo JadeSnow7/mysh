@@ -1,0 +1,10 @@
+^E:\WORKSPACE\MYSH\BUILD_NEW\CMAKEFILES\5F47C6130C64A8E1B6339234FADD660D\GENERATE.STAMP.RULE
+setlocal
+D:\Applications\Scoop\apps\cmake\current\bin\cmake.exe -SE:/workspace/mysh -BE:/workspace/mysh/build_new --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file E:/workspace/mysh/build_new/mysh.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
