@@ -59,9 +59,19 @@ elseif(APPLE)
 endif()
 
 # 设置输出目录
-set_target_properties(mysh PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
-)
+if(WIN32)
+    # Windows下Visual Studio生成器会自动创建配置目录
+    set_target_properties(mysh PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/Debug
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/Release
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+    )
+else()
+    # Linux和macOS使用单一输出目录
+    set_target_properties(mysh PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+    )
+endif()
 
 # 安装配置
 install(TARGETS mysh

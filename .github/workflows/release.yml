@@ -18,7 +18,7 @@ jobs:
             asset_path: build/bin/mysh
           - os: windows-latest
             asset_name: mysh-windows.exe
-            asset_path: build/bin/Release/mysh.exe
+            asset_path: build/Release/mysh.exe
 
     runs-on: ${{ matrix.os }}
 
@@ -36,7 +36,16 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y build-essential
 
-    - name: Configure CMake
+    - name: Set up Visual Studio (Windows)
+      if: matrix.os == 'windows-latest'
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Configure CMake (Windows)
+      if: matrix.os == 'windows-latest'
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Release -G "Visual Studio 17 2022" -A x64
+
+    - name: Configure CMake (Linux/macOS)
+      if: matrix.os != 'windows-latest'
       run: cmake -B build -DCMAKE_BUILD_TYPE=Release
 
     - name: Build
