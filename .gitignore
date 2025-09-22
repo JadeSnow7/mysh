@@ -1,0 +1,103 @@
+# Build directories
+build/
+build-*/
+*.dir/
+
+# CMake files
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps/
+
+# Xmake cache
+.xmake/
+
+# Visual Studio files
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.sln
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+.vs/
+
+# MinGW
+*.exe
+*.dll
+*.a
+*.lib
+
+# Object files
+*.o
+*.obj
+*.lo
+*.slo
+*.ko
+*.elf
+
+# Libraries
+*.la
+*.lai
+*.so
+*.so.*
+*.dylib
+
+# Executables
+mysh
+mysh.exe
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# MacOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux
+*~
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+*.lnk
+
+# Test files
+temp_test.sh
+output.txt
+test*.txt
+hello.txt
+
+# History files
+.mysh_history
+
+# Package files
+*.zip
+*.tar.gz
+*.tgz
+*.deb
+*.rpm
+*.dmg
+
+
