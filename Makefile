@@ -1,6 +1,10 @@
 # Makefile for MyShell
 
 
+
+
+
+
 CXX = g++
 CXXFLAGS = -std=c++17 -Wall -Wextra -O2 -Isrc -Isrc/core -Isrc/platform
 DEBUG_FLAGS = -std=c++17 -Wall -Wextra -g -DDEBUG -Isrc -Isrc/core -Isrc/platform
